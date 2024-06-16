@@ -42,4 +42,3 @@ if st.button("Predict"):
 from pyngrok import ngrok
 public_url = ngrok.connect(port='8501')
 print(f'Public URL: {public_url}')
-!streamlit run app.py &>/dev/null&
