@@ -38,7 +38,3 @@ if st.button("Predict"):
     prediction = preprocess_and_predict(user_input)
     st.write(f"The predicted author class is: {prediction}")
 
-# Start ngrok and Streamlit
-from pyngrok import ngrok
-public_url = ngrok.connect(port='8501')
-print(f'Public URL: {public_url}')
