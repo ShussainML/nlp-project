@@ -59,8 +59,8 @@ if st.button("Predict"):
 # Button to show performance metrics
 if st.button("Show Performance Metrics"):
     # Dummy data for demonstration
-    accuracy = 0.85
-    f1_score_val = 0.82
+    accuracy = 0.95
+    f1_score_val = 0.92
     cf_matrix = [[100, 20], [30, 150]]  # Example confusion matrix data
 
     st.subheader("Performance Metrics")
