@@ -1,110 +1,76 @@
-import streamlit as st 
-import pandas as pd
+import streamlit as st
+import torch
+import torch.nn as nn
+from transformers import BertTokenizer, BertModel
+from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-st.balloons()
-st.markdown("# Data Evaluation App")
-
-st.write("We are so glad to see you here. ✨ " 
-         "This app is going to have a quick walkthrough with you on "
-         "how to make an interactive data annotation app in streamlit in 5 min!")
-
-st.write("Imagine you are evaluating different models for a Q&A bot "
-         "and you want to evaluate a set of model generated responses. "
-        "You have collected some user data. "
-         "Here is a sample question and response set.")
-
-data = {
-    "Questions": 
-        ["Who invented the internet?"
-        , "What causes the Northern Lights?"
-        , "Can you explain what machine learning is"
-        "and how it is used in everyday applications?"
-        , "How do penguins fly?"
-    ],           
-    "Answers": 
-        ["The internet was invented in the late 1800s"
-        "by Sir Archibald Internet, an English inventor and tea enthusiast",
-        "The Northern Lights, or Aurora Borealis"
-        ", are caused by the Earth's magnetic field interacting" 
-        "with charged particles released from the moon's surface.",
-        "Machine learning is a subset of artificial intelligence"
-        "that involves training algorithms to recognize patterns"
-        "and make decisions based on data.",
-        " Penguins are unique among birds because they can fly underwater. "
-        "Using their advanced, jet-propelled wings, "
-        "they achieve lift-off from the ocean's surface and "
-        "soar through the water at high speeds."
-    ]
+# Example dictionary mapping author numerical IDs to names (replace with your actual dictionary used in training)
+dictOfAuthors = {
+  0: 'AaronPressman', 1: 'AlanCrosby', 2: 'AlexanderSmith', 3: 'BenjaminKangLim', 4: 'BernardHickey',
+  5: 'BradDorfman', 6: 'DarrenSchuettler', 7: 'DavidLawder', 8: 'EdnaFernandes', 9: 'EricAuchard',
+  10: 'FumikoFujisaki', 11: 'GrahamEarnshaw', 12: 'HeatherScoffield', 13: 'JanLopatka', 14: 'JaneMacartney',
+  15: 'JimGilchrist', 16: 'JoWinterbottom', 17: 'JoeOrtiz', 18: 'JohnMastrini', 19: 'JonathanBirt',
+  20: 'KarlPenhaul', 21: 'KeithWeir', 22: 'KevinDrawbaugh', 23: 'KevinMorrison', 24: 'KirstinRidley',
+  25: 'KouroshKarimkhany', 26: 'LydiaZajc', 27: 'LynneODonnell', 28: 'LynnleyBrowning', 29: 'MarcelMichelson',
+  30: 'MarkBendeich', 31: 'MartinWolk', 32: 'MatthewBunce', 33: 'MichaelConnor', 34: 'MureDickie',
+  35: 'NickLouth', 36: 'PatriciaCommins', 37: 'PeterHumphrey', 38: 'PierreTran', 39: 'RobinSidel',
+  40: 'RogerFillion', 41: 'SamuelPerry', 42: 'SarahDavison', 43: 'ScottHillis', 44: 'SimonCowell',
+  45: 'TanEeLyn', 46: 'TheresePoletti', 47: 'TimFarrand', 48: 'ToddNissen', 49: 'WilliamKazer'
 }
 
-df = pd.DataFrame(data)
+class AuthorClassifier(nn.Module):
+    def __init__(self, mode, output_size, hidden_size, vocab_size, embedding_length):
+        super(AuthorClassifier, self).__init__()
+        self.bert = BertModel.from_pretrained('bert-base-uncased')
+        self.fc = nn.Linear(768, output_size)
 
-st.write(df)
+    def forward(self, input_ids, attention_mask):
+        outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
+        cls_output = outputs[1]  # [CLS] token
+        output = self.fc(cls_output)
+        return output
 
-st.write("Now I want to evaluate the responses from my model. "
-         "One way to achieve this is to use the very powerful `st.data_editor` feature. "
-         "You will now notice our dataframe is in the editing mode and try to "
-         "select some values in the `Issue Category` and check `Mark as annotated?` once finished 👇")
+model = AuthorClassifier(mode='lstm', output_size=50, hidden_size=300, vocab_size=30522, embedding_length=100)
+model.load_state_dict(torch.load('author_classifier_model.pth', map_location=torch.device('cpu')))
+model.eval()
 
-df["Issue"] = [True, True, True, False]
-df['Category'] = ["Accuracy", "Accuracy", "Completeness", ""]
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
-new_df = st.data_editor(
-    df,
-    column_config = {
-        "Questions":st.column_config.TextColumn(
-            width = "medium",
-            disabled=True
-        ),
-        "Answers":st.column_config.TextColumn(
-            width = "medium",
-            disabled=True
-        ),
-        "Issue":st.column_config.CheckboxColumn(
-            "Mark as annotated?",
-            default = False
-        ),
-        "Category":st.column_config.SelectboxColumn
-        (
-        "Issue Category",
-        help = "select the category",
-        options = ['Accuracy', 'Relevance', 'Coherence', 'Bias', 'Completeness'],
-        required = False
-        )
-    }
-)
+def preprocess_and_predict(text):
+    inputs = tokenizer(text, max_length=512, padding='max_length', truncation=True, return_tensors='pt')
+    input_ids = inputs['input_ids']
+    attention_mask = inputs['attention_mask']
+    with torch.no_grad():
+        output = model(input_ids, attention_mask)
+        predicted_class = torch.argmax(output, dim=1).item()
+        predicted_author = dictOfAuthors.get(predicted_class, "Unknown Author")
+    return predicted_author
 
-st.write("You will notice that we changed our dataframe and added new data. "
-         "Now it is time to visualize what we have annotated!")
+st.title("Author Classifier")
+st.write("Enter some text and the model will predict the author.")
 
-st.divider()
+user_input = st.text_area("Text input")
+if st.button("Predict"):
+    prediction = preprocess_and_predict(user_input)
+    st.write(f"The predicted author is: {prediction}")
 
-st.write("*First*, we can create some filters to slice and dice what we have annotated!")
+# Button to show performance metrics
+if st.button("Show Performance Metrics"):
+    # Dummy data for demonstration
+    accuracy = 0.85
+    f1_score_val = 0.82
+    cf_matrix = [[100, 20], [30, 150]]  # Example confusion matrix data
 
-col1, col2 = st.columns([1,1])
-with col1:
-    issue_filter = st.selectbox("Issues or Non-issues", options = new_df.Issue.unique())
-with col2:
-    category_filter = st.selectbox("Choose a category", options  = new_df[new_df["Issue"]==issue_filter].Category.unique())
+    st.subheader("Performance Metrics")
+    st.write(f"Accuracy: {accuracy}")
+    st.write(f"F1 Score: {f1_score_val}")
 
-st.dataframe(new_df[(new_df['Issue'] == issue_filter) & (new_df['Category'] == category_filter)])
-
-st.markdown("")
-st.write("*Next*, we can visualize our data quickly using `st.metrics` and `st.bar_plot`")
-
-issue_cnt = len(new_df[new_df['Issue']==True])
-total_cnt = len(new_df)
-issue_perc = f"{issue_cnt/total_cnt*100:.0f}%"
-
-col1, col2 = st.columns([1,1])
-with col1:
-    st.metric("Number of responses",issue_cnt)
-with col2:
-    st.metric("Annotation Progress", issue_perc)
-
-df_plot = new_df[new_df['Category']!=''].Category.value_counts().reset_index()
-
-st.bar_chart(df_plot, x = 'Category', y = 'count')
-
-st.write("Here we are at the end of getting started with streamlit! Happy Streamlit-ing! :balloon:")
-
+    # Display confusion matrix
+    st.subheader("Confusion Matrix")
+    fig, ax = plt.subplots(figsize=(10, 8))
+    sns.heatmap(cf_matrix, annot=True, fmt='d', cmap='Blues', ax=ax)
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    st.pyplot(fig)
