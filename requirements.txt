@@ -4,3 +4,7 @@ transformers
 scikit-learn
 seaborn
 matplotlib
+spacy
+nltk
+pandas
+gdown
