@@ -35,7 +35,7 @@ dictOfAuthors = {
 # Function to download model from Google Drive
 @st.cache(allow_output_mutation=True)
 def download_model():
-    url = 'https://drive.google.com/uc?id=your_file_id'
+    url = 'https://drive.google.com/file/d/1xPBuaagEXFIMRyH3iaJ8Pfvho3sgBUP-/view?usp=sharing'
     output = 'model.pth'
     gdown.download(url, output, quiet=False)
     model = AuthorClassifier(mode='lstm', output_size=50, hidden_size=300, vocab_size=30522, embedding_length=100)
@@ -62,7 +62,7 @@ tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 @st.cache
 def load_test_data():
     # Assuming the test data is in CSV format and stored on Google Drive
-    url = 'https://drive.google.com/uc?id=your_test_file_id'
+    url = 'https://drive.google.com/file/d/1u2IoTNAbUVQdOvxo7URrxixoM4g8lOMA/view?usp=sharing'
     test_data = pd.read_csv(url)
     return test_data
 
