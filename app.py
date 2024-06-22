@@ -10,12 +10,20 @@ import matplotlib.pyplot as plt
 import spacy
 import nltk
 from nltk.stem import WordNetLemmatizer
+from spacy.cli.download import download as spacy_download
 
+# Download NLTK components
 nltk.download('wordnet')
 nltk.download('punkt')
 
 # Initialize SpaCy and NLTK components
-nlp = spacy.load('en_core_web_sm')
+try:
+    nlp = spacy.load('en_core_web_sm')
+except OSError:
+    # Download and install the 'en_core_web_sm' model if not found
+    spacy_download('en_core_web_sm')
+    nlp = spacy.load('en_core_web_sm')
+
 lemmatizer = WordNetLemmatizer()
 
 # Example dictionary mapping author numerical IDs to names (replace with your actual dictionary used in training)
@@ -35,7 +43,7 @@ dictOfAuthors = {
 # Function to download model from Google Drive
 @st.cache(allow_output_mutation=True)
 def download_model():
-    url = 'https://drive.google.com/file/d/1xPBuaagEXFIMRyH3iaJ8Pfvho3sgBUP-/view?usp=sharing'
+    url = 'https://drive.google.com/uc?id=1xPBuaagEXFIMRyH3iaJ8Pfvho3sgBUP-'
     output = 'model.pth'
     gdown.download(url, output, quiet=False)
     model = AuthorClassifier(mode='lstm', output_size=50, hidden_size=300, vocab_size=30522, embedding_length=100)
@@ -62,7 +70,7 @@ tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 @st.cache
 def load_test_data():
     # Assuming the test data is in CSV format and stored on Google Drive
-    url = 'https://drive.google.com/file/d/1u2IoTNAbUVQdOvxo7URrxixoM4g8lOMA/view?usp=sharing'
+    url = 'https://drive.google.com/uc?id=1u2IoTNAbUVQdOvxo7URrxixoM4g8lOMA'
     test_data = pd.read_csv(url)
     return test_data
 
