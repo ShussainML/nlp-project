@@ -2,9 +2,12 @@ spacy==3.7.5
 https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1.tar.gz
 streamlit==1.23.1
 torch
+transformers
+scikit-learn
 pandas==2.0.3
 numpy==1.25.2
 tensorflow==2.15.0
+spacy==3.7.5
 nltk==3.8.1
 seaborn==0.13.1
 matplotlib==3.7.1
