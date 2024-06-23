@@ -10,8 +10,7 @@ import matplotlib.pyplot as plt
 import spacy
 import nltk
 from nltk.stem import WordNetLemmatizer
-import pickle
-import os  # Import os module to handle file paths
+import os
 
 # Download SpaCy components
 nltk.download('wordnet')
@@ -42,11 +41,9 @@ def download_model():
     output_path = '/mount/src/nlp-project/model.pth'  # Adjust the path as per your directory structure
     gdown.download(url, output_path, quiet=False)
     
-    with open(output_path, 'rb') as f:
-        model_state = pickle.load(f)
-    
+    # Load the model using torch.load()
     model = AuthorClassifier()
-    model.load_state_dict(model_state)
+    model.load_state_dict(torch.load(output_path, map_location=torch.device('cpu')))  # Adjust map_location as needed
     model.eval()
     return model
 
