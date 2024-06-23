@@ -10,7 +10,10 @@ import matplotlib.pyplot as plt
 import spacy
 import nltk
 from nltk.stem import WordNetLemmatizer
+import pickle
+import os  # Import os module to handle file paths
 
+# Download SpaCy components
 nltk.download('wordnet')
 nltk.download('punkt')
 
@@ -33,20 +36,25 @@ dictOfAuthors = {
 }
 
 # Function to download model from Google Drive
+
 def download_model():
-    url = 'https://drive.google.com/file/d/1xPBuaagEXFIMRyH3iaJ8Pfvho3sgBUP-/view?usp=sharing'
-    output = 'model.pth'
-    gdown.download(url, output, quiet=False)
-    model = AuthorClassifier(mode='lstm', output_size=50, hidden_size=300, vocab_size=30522, embedding_length=100)
-    model.load_state_dict(torch.load(output, map_location=torch.device('cpu')))
+    url = 'https://drive.google.com/uc?id=1xPBuaagEXFIMRyH3iaJ8Pfvho3sgBUP-'
+    output_path = '/mount/src/nlp-project/model.pth'  # Adjust the path as per your directory structure
+    gdown.download(url, output_path, quiet=False)
+    
+    with open(output_path, 'rb') as f:
+        model_state = pickle.load(f)
+    
+    model = AuthorClassifier()
+    model.load_state_dict(model_state)
     model.eval()
     return model
 
 class AuthorClassifier(nn.Module):
-    def __init__(self, mode, output_size, hidden_size, vocab_size, embedding_length):
+    def __init__(self):
         super(AuthorClassifier, self).__init__()
         self.bert = BertModel.from_pretrained('bert-base-uncased')
-        self.fc = nn.Linear(768, output_size)
+        self.fc = nn.Linear(768, len(dictOfAuthors))  # Output size based on number of authors
 
     def forward(self, input_ids, attention_mask):
         outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
@@ -58,9 +66,9 @@ model = download_model()
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 # Load test dataset (to be used as validation data)
+
 def load_test_data():
-    # Assuming the test data is in CSV format and stored on Google Drive
-    url = 'https://drive.google.com/file/d/1u2IoTNAbUVQdOvxo7URrxixoM4g8lOMA/view?usp=sharing'
+    url = 'https://drive.google.com/uc?id=1u2IoTNAbUVQdOvxo7URrxixoM4g8lOMA'
     test_data = pd.read_csv(url)
     return test_data
 
