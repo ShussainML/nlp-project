@@ -9,3 +9,4 @@ matplotlib
 nltk
 pandas
 gdown
+tensorflow
