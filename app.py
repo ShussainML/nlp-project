@@ -44,15 +44,20 @@ def load_lstm_model():
         raise FileNotFoundError(f"File not found: {model_path}")
 
 # Load the tokenizer
+import os
+import json
+from tensorflow.keras.preprocessing.text import tokenizer_from_json
+
 def load_tokenizer():
     tokenizer_path = '/mount/src/nlp-project/tokenizer.json'
     if os.path.exists(tokenizer_path):
-        with open(tokenizer_path) as f:
+        with open(tokenizer_path, 'r') as f:
             data = json.load(f)
-            tokenizer = tokenizer_from_json(data)
+            tokenizer = tokenizer_from_json(json.dumps(data))
         return tokenizer
     else:
         raise FileNotFoundError(f"File not found: {tokenizer_path}")
+
 
 # Function to load test data
 def load_test_data():
