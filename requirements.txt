@@ -10,3 +10,4 @@ nltk
 pandas
 gdown
 tensorflow
+numpy
