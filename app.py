@@ -37,7 +37,7 @@ dictOfAuthors = {
 # Function to download model from Google Drive
 
 def download_model():
-    url = 'https://drive.google.com/file/d/1xPBuaagEXFIMRyH3iaJ8Pfvho3sgBUP-/view?usp=sharing'
+    url = 'https://drive.google.com/file/d/1xPBuaagEXFIMRyH3iaJ8Pfvho3sgBUP-'
     output_path = '/mount/src/nlp-project/model.pth'  # Adjust the path as per your directory structure
     gdown.download(url, output_path, quiet=False)
     
@@ -65,7 +65,7 @@ tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 # Load test dataset (to be used as validation data)
 
 def load_test_data():
-    url = 'https://drive.google.com/file/d/1u2IoTNAbUVQdOvxo7URrxixoM4g8lOMA/view?usp=sharing'
+    url = 'https://drive.google.com/file/d/1u2IoTNAbUVQdOvxo7URrxixoM4g8lOMA'
     test_data = pd.read_csv(url)
     return test_data
 
