@@ -12,7 +12,7 @@ import nltk
 from nltk.stem import WordNetLemmatizer
 import os
 
-# Download SpaCy components
+# Download NLTK components
 nltk.download('wordnet')
 nltk.download('punkt')
 
@@ -20,7 +20,7 @@ nltk.download('punkt')
 nlp = spacy.load('en_core_web_sm')
 lemmatizer = WordNetLemmatizer()
 
-# Example dictionary mapping author numerical IDs to names (replace with your actual dictionary used in training)
+# Example dictionary mapping author numerical IDs to names
 dictOfAuthors = {
     0: 'AaronPressman', 1: 'AlanCrosby', 2: 'AlexanderSmith', 3: 'BenjaminKangLim', 4: 'BernardHickey',
     5: 'BradDorfman', 6: 'DarrenSchuettler', 7: 'DavidLawder', 8: 'EdnaFernandes', 9: 'EricAuchard',
@@ -34,19 +34,7 @@ dictOfAuthors = {
     45: 'TanEeLyn', 46: 'TheresePoletti', 47: 'TimFarrand', 48: 'ToddNissen', 49: 'WilliamKazer'
 }
 
-# Function to download model from Google Drive
-
-def download_model():
-    url = 'https://drive.google.com/file/d/1xPBuaagEXFIMRyH3iaJ8Pfvho3sgBUP-'
-    output_path = '/mount/src/nlp-project/model.pth'  # Adjust the path as per your directory structure
-    gdown.download(url, output_path, quiet=False)
-    
-    # Load the model using torch.load()
-    model = AuthorClassifier()
-    model.load_state_dict(torch.load(output_path, map_location=torch.device('cpu')))  # Adjust map_location as needed
-    model.eval()
-    return model
-
+# Define the AuthorClassifier model class
 class AuthorClassifier(nn.Module):
     def __init__(self):
         super(AuthorClassifier, self).__init__()
@@ -59,16 +47,35 @@ class AuthorClassifier(nn.Module):
         output = self.fc(cls_output)
         return output
 
+# Function to download model from Google Drive
+def download_model():
+    url = 'https://drive.google.com/uc?id=1xPBuaagEXFIMRyH3iaJ8Pfvho3sgBUP-'  # Google Drive file ID for exact download
+    output_path = '/mount/src/nlp-project/author_classifier_model.pth'  # Save to specified directory
+
+    if not os.path.exists(output_path):
+        gdown.download(url, output_path, quiet=False)
+
+    model = AuthorClassifier()
+    model.load_state_dict(torch.load(output_path, map_location=torch.device('cpu')))  # Adjust map_location as needed
+    model.eval()
+    return model
+
+# Model and Tokenizer loading
 model = download_model()
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
-# Load test dataset (to be used as validation data)
-
+# Function to load test data from Google Drive
 def load_test_data():
-    url = 'https://drive.google.com/file/d/1u2IoTNAbUVQdOvxo7URrxixoM4g8lOMA'
-    test_data = pd.read_csv(url)
+    url = 'https://drive.google.com/uc?id=1u2IoTNAbUVQdOvxo7URrxixoM4g8lOMA'  # Make sure drive download URL is correct
+    output_path = '/mount/src/nlp-project/mega_test.csv'  # Save to specified directory
+
+    if not os.path.exists(output_path):
+        gdown.download(url, output_path, quiet=False)
+
+    test_data = pd.read_csv(output_path)
     return test_data
 
+# Load test data
 test_data = load_test_data()
 
 # Preprocessing function
@@ -77,12 +84,14 @@ def preprocess_text(text):
     tokens = [lemmatizer.lemmatize(token.text.lower()) for token in doc if token.is_alpha]
     return ' '.join(tokens)
 
+# Apply pre-processing on the text in the test data
 test_data['text'] = test_data['text'].apply(preprocess_text)
 
 # Assuming the Author column is present in the test data
 swap_dict = {value: key for key, value in dictOfAuthors.items()}
 test_data['Author_num'] = test_data['Author'].map(swap_dict)
 
+# Function to preprocess the text and obtain predictions
 def preprocess_and_predict(text):
     inputs = tokenizer(text, max_length=512, padding='max_length', truncation=True, return_tensors='pt')
     input_ids = inputs['input_ids']
@@ -93,6 +102,7 @@ def preprocess_and_predict(text):
         predicted_author = dictOfAuthors.get(predicted_class, "Unknown Author")
     return predicted_author
 
+# Function to evaluate the model
 def evaluate_model(test_data):
     y_true = test_data['Author_num'].tolist()
     y_pred = []
@@ -107,6 +117,7 @@ def evaluate_model(test_data):
     cf_matrix = confusion_matrix(y_true, y_pred)
     return accuracy, f1, cf_matrix
 
+# Streamlit UI
 st.title("Author Classifier")
 st.write("Enter some text and the model will predict the author.")
 
