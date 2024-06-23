@@ -37,7 +37,7 @@ dictOfAuthors = {
 
 # Function to download the model from Google Drive
 def download_model():
-    model_url = 'https://drive.google.com/file/d/1DWm7WS-QqxNsfhklWoLQM4qD0GHvbJx9'  # Replace with actual file ID
+    model_url = 'https://drive.google.com/file/d/1xGwRP9stzv1_vcRtm6hmrhCJle72hNTp'  # Replace with actual file ID
     model_output_path1 = '/mount/src/nlp-project/author_lstm_model'  # Save to current directory
 
     if not os.path.exists(model_output_path1):
@@ -51,7 +51,7 @@ def download_model():
 
 # Function to download tokenizer from Google Drive
 def download_tokenizer():
-    tokenizer_url = 'https://drive.google.com/file/d/1GGv4rZQaodgIFWlnjTzQpOhYCKwNIox_'  # Replace with actual file ID
+    tokenizer_url = 'https://drive.google.com/file/d/1fPrvcUotDRUbjtmY_F9nnYPZqMOFfZy1'  # Replace with actual file ID
     tokenizer_output_path = '/mount/src/nlp-project/tokenizer.json'
 
     if not os.path.exists(tokenizer_output_path):
