@@ -48,6 +48,7 @@ class AuthorClassifier(nn.Module):
         return output
 
 # Function to download model from Google Drive
+@st.cache_data
 def download_model():
     url = 'https://drive.google.com/uc?id=1xPBuaagEXFIMRyH3iaJ8Pfvho3sgBUP-'  # Google Drive file ID for exact download
     output_path = '/mount/src/nlp-project/author_classifier_model.pth'  # Save to specified directory
@@ -65,6 +66,7 @@ model = download_model()
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 # Function to load test data from Google Drive
+@st.cache_data
 def load_test_data():
     url = 'https://drive.google.com/uc?id=1u2IoTNAbUVQdOvxo7URrxixoM4g8lOMA'  # Make sure drive download URL is correct
     output_path = '/mount/src/nlp-project/mega_test.csv'  # Save to specified directory
