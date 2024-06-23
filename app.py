@@ -13,6 +13,7 @@ from nltk.stem import WordNetLemmatizer
 import os
 import json
 import numpy as np
+
 # Download NLTK components
 nltk.download('wordnet')
 nltk.download('punkt')
@@ -37,21 +38,21 @@ dictOfAuthors = {
 
 # Function to download the model from Google Drive
 def download_model():
-    model_url = 'https://drive.google.com/file/d/1xGwRP9stzv1_vcRtm6hmrhCJle72hNTp'  # Replace with actual file ID
-    model_output_path1 = '/mount/src/nlp-project/author_lstm_model.h5'  # Save to current directory
+    model_url = 'https://drive.google.com/uc?id=1xGwRP9stzv1_vcRtm6hmrhCJle72hNTp'  # Update with the correct Google Drive file ID
+    model_output_path = '/mount/src/nlp-project/author_lstm_model.h5'  # Save to current directory
 
-    if not os.path.exists(model_output_path1):
-        gdown.download(model_url, model_output_path1, quiet=False)
+    if not os.path.exists(model_output_path):
+        gdown.download(model_url, model_output_path, quiet=False)
     
-    if os.path.exists(model_output_path1):
-        model = load_model(model_output_path1)
+    if os.path.exists(model_output_path):
+        model = load_model(model_output_path)
         return model
     else:
-        raise FileNotFoundError(f"File not found: \n\nfilepath={model_output_path1}. Please ensure the file is an accessible `.keras` file.")
+        raise FileNotFoundError(f"File not found: {model_output_path}. Please ensure the file is an accessible `.h5` file.")
 
 # Function to download tokenizer from Google Drive
 def download_tokenizer():
-    tokenizer_url = 'https://drive.google.com/file/d/1fPrvcUotDRUbjtmY_F9nnYPZqMOFfZy1'  # Replace with actual file ID
+    tokenizer_url = 'https://drive.google.com/uc?id=1fPrvcUotDRUbjtmY_F9nnYPZqMOFfZy1'  # Update with the correct Google Drive file ID
     tokenizer_output_path = '/mount/src/nlp-project/tokenizer.json'
 
     if not os.path.exists(tokenizer_output_path):
@@ -63,7 +64,7 @@ def download_tokenizer():
             tokenizer = tokenizer_from_json(data)
         return tokenizer
     else:
-        raise FileNotFoundError(f"File not found: \n\nfilepath={tokenizer_output_path}. Please ensure the file is an accessible `.json` file.")
+        raise FileNotFoundError(f"File not found: {tokenizer_output_path}. Please ensure the file is an accessible `.json` file.")
 
 # Load the LSTM model and tokenizer
 model = download_model()
@@ -71,7 +72,7 @@ tokenizer = download_tokenizer()
 
 # Function to load test data from Google Drive
 def load_test_data():
-    test_data_url = 'https://drive.google.com/uc?id=1u2IoTNAbUVQdOvxo7URrxixoM4g8lOMA'  # Correct Google Drive URL
+    test_data_url = 'https://drive.google.com/uc?id=1u2IoTNAbUVQdOvxo7URrxixoM4g8lOMA'  # Update with the correct Google Drive file ID
     test_data_output_path = '/mount/src/nlp-project/mega_test.csv'  # Save to current directory
 
     if not os.path.exists(test_data_output_path):
@@ -81,7 +82,7 @@ def load_test_data():
         test_data = pd.read_csv(test_data_output_path)
         return test_data
     else:
-        raise FileNotFoundError(f"File not found: \n\nfilepath={test_data_output_path}. Please ensure the file is an accessible `.csv` file.")
+        raise FileNotFoundError(f"File not found: {test_data_output_path}. Please ensure the file is an accessible `.csv` file.")
 
 # Load test data
 test_data = load_test_data()
