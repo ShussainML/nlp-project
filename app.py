@@ -33,7 +33,6 @@ dictOfAuthors = {
 }
 
 # Function to download model from Google Drive
-@st.cache_data
 def download_model():
     url = 'https://drive.google.com/file/d/1xPBuaagEXFIMRyH3iaJ8Pfvho3sgBUP-/view?usp=sharing'
     output = 'model.pth'
@@ -59,7 +58,6 @@ model = download_model()
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 # Load test dataset (to be used as validation data)
-@st.cache_data
 def load_test_data():
     # Assuming the test data is in CSV format and stored on Google Drive
     url = 'https://drive.google.com/file/d/1u2IoTNAbUVQdOvxo7URrxixoM4g8lOMA/view?usp=sharing'
