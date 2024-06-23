@@ -1,7 +1,7 @@
 import streamlit as st
-import torch
-import torch.nn as nn
-from transformers import BertTokenizer, BertModel
+import tensorflow as tf
+from tensorflow.keras.preprocessing.text import tokenizer_from_json
+from tensorflow.keras.models import load_model
 import gdown
 import pandas as pd
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
@@ -11,7 +11,8 @@ import spacy
 import nltk
 from nltk.stem import WordNetLemmatizer
 import os
-
+import json
+import numpy as np
 # Download NLTK components
 nltk.download('wordnet')
 nltk.download('punkt')
@@ -34,35 +35,30 @@ dictOfAuthors = {
     45: 'TanEeLyn', 46: 'TheresePoletti', 47: 'TimFarrand', 48: 'ToddNissen', 49: 'WilliamKazer'
 }
 
-# Define the AuthorClassifier model class
-class AuthorClassifier(nn.Module):
-    def __init__(self):
-        super(AuthorClassifier, self).__init__()
-        self.bert = BertModel.from_pretrained('bert-base-uncased')
-        self.fc = nn.Linear(768, len(dictOfAuthors))  # Output size based on number of authors
-
-    def forward(self, input_ids, attention_mask):
-        outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
-        cls_output = outputs[1]  # [CLS] token
-        output = self.fc(cls_output)
-        return output
-
-# Function to download model from Google Drive
+# Function to download the model from Google Drive
 def download_model():
-    url = 'https://drive.google.com/uc?id=1xPBuaagEXFIMRyH3iaJ8Pfvho3sgBUP-'  # Google Drive file ID for exact download
-    output_path = '/mount/src/nlp-project/author_classifier_model.pth'  # Save to specified directory
+    url = 'https://drive.google.com/file/d/1DWm7WS-QqxNsfhklWoLQM4qD0GHvbJx9'  # Replace with LSTM model file ID if necessary
+    output_path = '/mount/src/nlp-project/author_lstm_model.keras'  # Save to specified directory
 
     if not os.path.exists(output_path):
         gdown.download(url, output_path, quiet=False)
 
-    model = AuthorClassifier()
-    model.load_state_dict(torch.load(output_path, map_location=torch.device('cpu')))  # Adjust map_location as needed
-    model.eval()
+    model = load_model(output_path)
     return model
 
-# Model and Tokenizer loading
+# Load the LSTM model
 model = download_model()
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
+# Download and load tokenizer
+tokenizer_url = 'https://drive.google.com/uc?id=1u2IoTNAbUVQdOvxo7URrxixoM4g8lOMA'  # Replace with your tokenizer file ID if necessary
+output_tokenizer_path = 'tokenizer.json'
+
+if not os.path.exists(output_tokenizer_path):
+    gdown.download(tokenizer_url, output_tokenizer_path, quiet=False)
+
+with open(output_tokenizer_path) as f:
+    data = json.load(f)
+    tokenizer = tokenizer_from_json(data)
 
 # Function to load test data from Google Drive
 def load_test_data():
@@ -93,13 +89,13 @@ test_data['Author_num'] = test_data['Author'].map(swap_dict)
 
 # Function to preprocess the text and obtain predictions
 def preprocess_and_predict(text):
-    inputs = tokenizer(text, max_length=512, padding='max_length', truncation=True, return_tensors='pt')
-    input_ids = inputs['input_ids']
-    attention_mask = inputs['attention_mask']
-    with torch.no_grad():
-        output = model(input_ids, attention_mask)
-        predicted_class = torch.argmax(output, dim=1).item()
-        predicted_author = dictOfAuthors.get(predicted_class, "Unknown Author")
+    preprocessed_text = preprocess_text(text)
+    tokenized_input = tokenizer.texts_to_sequences([preprocessed_text])
+    padded_input = tf.keras.preprocessing.sequence.pad_sequences(tokenized_input, maxlen=512, padding='post')
+    
+    prediction_probs = model.predict(padded_input)
+    predicted_author_index = np.argmax(prediction_probs, axis=1)[0]
+    predicted_author = dictOfAuthors.get(predicted_author_index, "Unknown Author")
     return predicted_author
 
 # Function to evaluate the model
