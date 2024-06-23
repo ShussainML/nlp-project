@@ -48,7 +48,7 @@ class AuthorClassifier(nn.Module):
         return output
 
 # Function to download model from Google Drive
-@st.cache_data
+@st.cache_resource
 def download_model():
     url = 'https://drive.google.com/uc?id=1xPBuaagEXFIMRyH3iaJ8Pfvho3sgBUP-'  # Google Drive file ID for exact download
     output_path = '/mount/src/nlp-project/author_classifier_model.pth'  # Save to specified directory
