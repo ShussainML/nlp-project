@@ -39,7 +39,7 @@ dictOfAuthors = {
 def load_lstm_model():
     model_path = '/mount/src/nlp-project/author_lstm_model.h5'
     if os.path.exists(model_path):
-        model = load_model(model_path)
+        model =  tf.keras.models.load_model(model_path)
         return model
     else:
         raise FileNotFoundError(f"File not found: {model_path}")
