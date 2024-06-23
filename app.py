@@ -47,17 +47,28 @@ def load_lstm_model():
 import os
 import json
 from tensorflow.keras.preprocessing.text import tokenizer_from_json
+import os
+import json
+from tensorflow.keras.preprocessing.text import tokenizer_from_json
 
 def load_tokenizer():
     tokenizer_path = '/mount/src/nlp-project/tokenizer.json'
     if os.path.exists(tokenizer_path):
         with open(tokenizer_path, 'r') as f:
             data = json.load(f)
-            tokenizer = tokenizer_from_json(json.dumps(data))
+            # Parse JSON strings within the config
+            if 'config' in data:
+                config = data['config']
+                if 'word_counts' in config:
+                    config['word_counts'] = json.loads(config['word_counts'])
+                if 'word_docs' in config:
+                    config['word_docs'] = json.loads(config['word_docs'])
+                if 'index_docs' in config:
+                    config['index_docs'] = json.loads(config['index_docs'])
+            tokenizer = tokenizer_from_json(data)
         return tokenizer
     else:
         raise FileNotFoundError(f"File not found: {tokenizer_path}")
-
 
 # Function to load test data
 def load_test_data():
