@@ -38,21 +38,21 @@ dictOfAuthors = {
 # Function to download the model from Google Drive
 def download_model():
     model_url = 'https://drive.google.com/file/d/1DWm7WS-QqxNsfhklWoLQM4qD0GHvbJx9'  # Replace with actual file ID
-    model_output_path = '/mount/src/nlp-project/author_lstm_model.keras'  # Save to current directory
+    model_output_path1 = '/mount/src/nlp-project/author_lstm_model'  # Save to current directory
 
-    if not os.path.exists(model_output_path):
-        gdown.download(model_url, model_output_path, quiet=False)
+    if not os.path.exists(model_output_path1):
+        gdown.download(model_url, model_output_path1, quiet=False)
     
-    if os.path.exists(model_output_path):
-        model = load_model(model_output_path)
+    if os.path.exists(model_output_path1):
+        model = load_model(model_output_path1)
         return model
     else:
-        raise FileNotFoundError(f"File not found: \n\nfilepath={model_output_path}. Please ensure the file is an accessible `.keras` file.")
+        raise FileNotFoundError(f"File not found: \n\nfilepath={model_output_path1}. Please ensure the file is an accessible `.keras` file.")
 
 # Function to download tokenizer from Google Drive
 def download_tokenizer():
-    tokenizer_url = 'https://drive.google.com/uc?id=1u2IoTNAbUVQdOvxo7URrxixoM4g8lOMA'  # Replace with actual file ID
-    tokenizer_output_path = 'tokenizer.json'
+    tokenizer_url = 'https://drive.google.com/file/d/1GGv4rZQaodgIFWlnjTzQpOhYCKwNIox_'  # Replace with actual file ID
+    tokenizer_output_path = '/mount/src/nlp-project/tokenizer.json'
 
     if not os.path.exists(tokenizer_output_path):
         gdown.download(tokenizer_url, tokenizer_output_path, quiet=False)
