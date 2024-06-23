@@ -1,7 +1,6 @@
 import streamlit as st
 import tensorflow as tf
 from tensorflow.keras.preprocessing.text import tokenizer_from_json
-from tensorflow.keras.models import load_model
 import pandas as pd
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
 import seaborn as sns
