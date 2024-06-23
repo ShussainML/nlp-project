@@ -38,7 +38,7 @@ dictOfAuthors = {
 
 # Function to download the model from Google Drive
 def download_model():
-    model_url = 'https://drive.google.com/uc?id=1_f2xxP8WQoF_Cax-7Eah3ZenYxX81Fv9'  # Update with the correct Google Drive file ID
+    model_url = 'https://drive.google.com/uc?id=1NbH6HyQuKip_0JUlQtx4U03Qv5Hidv4w'  # Update with the correct Google Drive file ID
     model_output_path = '/mount/src/nlp-project/author_lstm_model.h5'  # Save to current directory
 
     if not os.path.exists(model_output_path):
