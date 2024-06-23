@@ -33,7 +33,7 @@ dictOfAuthors = {
 }
 
 # Function to download model from Google Drive
-@st.cache_data(allow_output_mutation=True)
+@st.cache_data
 def download_model():
     url = 'https://drive.google.com/file/d/1xPBuaagEXFIMRyH3iaJ8Pfvho3sgBUP-/view?usp=sharing'
     output = 'model.pth'
