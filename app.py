@@ -3,9 +3,9 @@ import torch
 from transformers import BartForSequenceClassification, BartTokenizer
 
 # Function to load model and tokenizer from Hugging Face
-@st.cache()
+@st.cache(hash_funcs={BartTokenizer: lambda _: None, BartForSequenceClassification: lambda _: None})
 def load_model_and_tokenizer():
-    model_name = "sajid227/nlp-project-author-identifcation/model.safetensors"  # Hugging Face model name
+    model_name = "facebook/bart-large-cnn"  # Example model name, replace with your correct model name
     
     # Load tokenizer
     tokenizer = BartTokenizer.from_pretrained(model_name)
@@ -28,7 +28,7 @@ def predict(model, tokenizer, text):
 def main():
     st.title("BART Model Deployment")
     
-    # Load model and tokenizer using st.cache
+    # Load model and tokenizer using st.cache_data
     tokenizer, model = load_model_and_tokenizer()
     
     text_input = st.text_input("Enter text to classify:", "")
