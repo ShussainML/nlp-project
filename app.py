@@ -10,7 +10,7 @@ def download_from_drive(file_id, output):
     gdown.download(url, output, quiet=False)
 
 # Function to load model and tokenizer
-st.legacy_caching.caching.clear_cache()
+@st.legacy_caching.caching.clear_cache()
 @st.cache_resource()
 def load_model_and_tokenizer():
     model_dir = "model"  # Directory to store the downloaded model
