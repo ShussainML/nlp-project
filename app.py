@@ -11,7 +11,7 @@ def load_model_and_tokenizer():
     tokenizer = BartTokenizer.from_pretrained(model_name)
     
     # Load model
-    model = BartForSequenceClassification.from_pretrained(model_name)
+    model = BartForSequenceClassification.from_pretrained('sajid227/nlp-project-author-identifcation')
     
     return tokenizer, model
 
