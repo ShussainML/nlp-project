@@ -16,7 +16,7 @@ def load_model_and_tokenizer(model_dir):
         os.makedirs(model_dir)
     
     # Download files from Google Drive
-    model_file_id = "1sWO4oKdh1jSsZGEIyZdTRED6p8NZS-Qr"
+    model_file_id = "1sg5Bh9mNzFTPLQ6lJ7sdLysGfvsc_QCk"
     config_file_id = "1fG6ipwD1beP0T3Sg3a8mWZMS2RPhuV5I"
     vocab_file_id = "1pM8C97I8SH3UVfPsUTBJsA_9xv8FeCJi"
     
