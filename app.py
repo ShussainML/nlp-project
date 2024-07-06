@@ -21,21 +21,21 @@ def load_model_and_tokenizer(model_dir):
     special_tokens_file_id = "1C0AKDHXgy3t5XiWRm-F2bKlgQLEFns8d"  # ID for special_tokens_map.json
     tokenizer_config_file_id = "1_DzOqJxYt8PXwePOcvqbiXSAZVStpAMC"  # ID for tokenizer_config.json
     vocab_file_id = "1pM8C97I8SH3UVfPsUTBJsA_9xv8FeCJi"  # ID for vocab.json
-    
+    merges_file_id = "1HlrLg_CuoGFsPKHEPTYOEw1ZK79QfqWI"  # ID for merges.txt
     # Paths to save the files
     model_path = os.path.join(model_dir, "pytorch_model.bin")
     config_path = os.path.join(model_dir, "config.json")
     special_tokens_path = os.path.join(model_dir, "special_tokens_map.json")
     tokenizer_config_path = os.path.join(model_dir, "tokenizer_config.json")
     vocab_path = os.path.join(model_dir, "vocab.json")
-    
+    merges_path = os.path.join(model_dir, "merges.txt")
     # Download files
     download_from_drive(model_file_id, model_path)
     download_from_drive(config_file_id, config_path)
     download_from_drive(special_tokens_file_id, special_tokens_path)
     download_from_drive(tokenizer_config_file_id, tokenizer_config_path)
     download_from_drive(vocab_file_id, vocab_path)
-    
+    download_from_drive(merges_file_id, merges_path)
     # Load tokenizer
     tokenizer = BartTokenizer.from_pretrained(model_dir)
     
