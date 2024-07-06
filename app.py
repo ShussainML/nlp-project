@@ -5,7 +5,7 @@ from transformers import BartForSequenceClassification, BartTokenizer
 # Function to load model and tokenizer from Hugging Face
 @st.cache()
 def load_model_and_tokenizer():
-    model_name = "sajid227/nlp-project-author-identifcation"  # Hugging Face model name
+    model_name = "sajid227/nlp-project-author-identifcation/model.safetensors"  # Hugging Face model name
     
     # Load tokenizer
     tokenizer = BartTokenizer.from_pretrained(model_name)
