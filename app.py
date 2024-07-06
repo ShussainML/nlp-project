@@ -10,7 +10,7 @@ def download_from_drive(file_id, output):
     gdown.download(url, output, quiet=False)
 
 # Function to load model and tokenizer
-st.cache_resource
+@st.cache_resource(allow_output_mutation=True)
 def load_model_and_tokenizer(model_dir):
     # Ensure the model directory exists
     if not os.path.exists(model_dir):
