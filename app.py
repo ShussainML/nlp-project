@@ -19,7 +19,7 @@ dictOfAuthors = {
 }
 
 # Function to load model and tokenizer from Hugging Face
-@st.cache(hash_funcs={BartTokenizer: lambda _: None, BartForSequenceClassification: lambda _: None})
+@st.cache()
 def load_model_and_tokenizer():
     model_name = "facebook/bart-large-cnn"  # Example model name, replace with your correct model name
     
