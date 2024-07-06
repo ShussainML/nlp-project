@@ -2,4 +2,4 @@ streamlit
 torch
 transformers
 gdown
-tensorflow  # Add TensorFlow if needed
+tf-keras
