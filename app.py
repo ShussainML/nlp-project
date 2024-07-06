@@ -5,7 +5,7 @@ from transformers import BartForSequenceClassification, BartTokenizer
 # Function to load model and tokenizer
 def load_model_and_tokenizer():
     # Replace with your actual path or URL where your model is stored
-    model_path = "https://url_to_your_model/model_name"
+    model_path = "https://drive.google.com/drive/folders/1sWO4oKdh1jSsZGEIyZdTRED6p8NZS-Qr"
     
     # Load tokenizer
     tokenizer = BartTokenizer.from_pretrained(model_path)
