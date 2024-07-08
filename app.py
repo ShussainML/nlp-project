@@ -55,7 +55,7 @@ def evaluate_model_performance():
 
 # Streamlit app
 def main():
-    st.title("BART Model Deployment")
+    st.title("Author Identification")
     
     # Load model and tokenizer using st.cache_data
     st.write("Loading model and tokenizer...")
