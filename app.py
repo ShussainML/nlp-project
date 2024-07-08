@@ -56,9 +56,6 @@ def evaluate_model_performance():
 # Streamlit app
 def main():
     st.title("Author Identification")
-    
-    # Load model and tokenizer using st.cache_data
-    st.write("Loading model and tokenizer...")
     tokenizer, model = load_model_and_tokenizer()
     st.write("Model and tokenizer loaded successfully!")
     
