@@ -1,7 +1,8 @@
-streamlit
-torch
-transformers
-scikit-learn
-numpy
-spacy
-nltk
+streamlit>=1.20.0
+torch>=2.0.0
+transformers>=4.25.0
+scikit-learn>=1.0.0
+numpy>=1.20.0
+spacy>=3.2.0
+nltk>=3.6.0
+en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.5.0/en_core_web_sm-3.5.0-py3-none-any.whl
