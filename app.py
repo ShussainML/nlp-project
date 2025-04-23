@@ -4,35 +4,22 @@ import os
 import nltk
 import spacy
 from nltk.stem import WordNetLemmatizer
-from nltk.corpus import stopwords
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
-import numpy as np
 
 # Set environment variable to avoid CUDA initialization errors
 os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 # Ensure necessary NLTK downloads
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt')
-try:
-    nltk.data.find('corpora/wordnet')
-except LookupError:
-    nltk.download('wordnet')
-try:
-    nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords')
+nltk.download('punkt', quiet=True)
+nltk.download('wordnet', quiet=True)
+nltk.download('stopwords', quiet=True)
 
 # Load SpaCy model with error handling
 try:
     nlp = spacy.load('en_core_web_sm')
 except OSError:
-    st.error("SpaCy model not found. Installing now...")
-    import subprocess
-    subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
-    nlp = spacy.load('en_core_web_sm')
+    st.error("SpaCy model 'en_core_web_sm' not found. Please run: python -m spacy download en_core_web_sm")
+    st.stop()
 
 lemmatizer = WordNetLemmatizer()
 stop_words = set(nltk.corpus.stopwords.words('english'))
@@ -64,34 +51,15 @@ def preprocess_text(text):
 # Function to load model and tokenizer from Hugging Face
 @st.cache_resource
 def load_model_and_tokenizer():
-    model_path = "sajid227/nlp-project-author-identifcation"
+    model_name = "sajid227/nlp-project-author-identifcation"
     
     try:
-        # Load tokenizer and model using Auto classes for better compatibility
-        tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-        model = AutoModelForSequenceClassification.from_pretrained(model_path, trust_remote_code=True)
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        model = AutoModelForSequenceClassification.from_pretrained(model_name)
         return tokenizer, model
     except Exception as e:
-        st.error(f"Error loading model from HuggingFace: {str(e)}")
-        st.info("Trying to load from local path...")
-        
-        try:
-            # Try loading from local path if available
-            local_model_path = "./my_bart_model"  # Adjust path as needed
-            tokenizer = AutoTokenizer.from_pretrained(local_model_path)
-            model = AutoModelForSequenceClassification.from_pretrained(local_model_path)
-            return tokenizer, model
-        except Exception as e2:
-            st.error(f"Local model loading failed: {str(e2)}")
-            
-            # Final fallback - try with base BART tokenizer
-            try:
-                tokenizer = AutoTokenizer.from_pretrained("facebook/bart-base")
-                model = AutoModelForSequenceClassification.from_pretrained(model_path)
-                return tokenizer, model
-            except Exception as e3:
-                st.error(f"All fallback attempts failed: {str(e3)}")
-                raise
+        st.error(f"Error loading model: {str(e)}")
+        st.stop()
 
 # Function to predict author name
 def predict_author_name(model, tokenizer, text):
@@ -102,12 +70,10 @@ def predict_author_name(model, tokenizer, text):
         # Tokenize and prepare for model input
         inputs = tokenizer(
             preprocessed_text,
-            add_special_tokens=True,
+            return_tensors="pt",
             truncation=True,
             max_length=512,
-            padding='max_length',
-            return_attention_mask=True,
-            return_tensors='pt'
+            padding="max_length"
         )
         
         # Run prediction
@@ -116,7 +82,7 @@ def predict_author_name(model, tokenizer, text):
         
         # Get prediction results
         logits = outputs.logits
-        predicted_class = logits.argmax(dim=-1).item()
+        predicted_class = logits.argmax().item()
         predicted_author = dictOfAuthors.get(predicted_class, "Unknown")
         
         # Calculate confidence
@@ -142,10 +108,9 @@ def main():
     st.write("This app identifies the author of a given text using a fine-tuned BART model.")
     
     # Show loading spinner while loading the model
-    with st.spinner("Loading model and tokenizer... This may take a minute."):
+    with st.spinner("Loading model and tokenizer..."):
         try:
             tokenizer, model = load_model_and_tokenizer()
-            st.success("Model loaded successfully!")
         except Exception as e:
             st.error(f"Failed to load model: {str(e)}")
             st.stop()
@@ -154,19 +119,19 @@ def main():
     text_input = st.text_area("Enter text to classify:", height=200)
     
     if st.button("Predict"):
-        if text_input:
+        if text_input.strip():
             with st.spinner("Predicting author..."):
                 predicted_author, confidence, top_authors = predict_author_name(model, tokenizer, text_input)
                 
                 # Display results
-                st.write("### Results")
-                st.write(f"**Predicted author:** {predicted_author}")
-                st.write(f"**Confidence:** {confidence:.2f}%")
+                st.subheader("Results")
+                st.metric("Predicted Author", predicted_author, f"{confidence:.1f}% confidence")
                 
                 # Show top predictions
-                st.write("### Top 3 Predictions")
-                for author, conf in top_authors:
-                    st.write(f"- {author}: {conf:.2f}%")
+                st.subheader("Top 3 Predictions")
+                cols = st.columns(3)
+                for i, (author, conf) in enumerate(top_authors):
+                    cols[i].metric(f"#{i+1}", author, f"{conf:.1f}%")
         else:
             st.warning("Please enter some text to classify.")
     
