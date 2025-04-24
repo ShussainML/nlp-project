@@ -37,7 +37,7 @@ def preprocess_text(text):
 # Load model/tokenizer/config from Hugging Face
 @st.cache_resource
 def load_model_and_tokenizer():
-    model_name = "sajid227/nlp-project-author-identifcation"
+    model_name = "sajid227/nlp-project-author-identification"
     
     try:
         tokenizer = AutoTokenizer.from_pretrained(model_name)
